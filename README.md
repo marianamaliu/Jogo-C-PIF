@@ -4,7 +4,7 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
 
 ## Requisitos 🧰
 - Uma máquina Linux/MacOs/Windows
-- Caso seja `Windows`, necessita baixar uma máquina virtual `Linux` para conseguir executar o jogo.
+- Caso seja `Windows`, necessita baixar uma máquina virtual `Linux` para conseguir executar o jogo
 - *__TUTORIAL__* : 
   
   [![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://youtu.be/Gl9CCqlGOZM?si=fnIdJcxA8zisIat-)
