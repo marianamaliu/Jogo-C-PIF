@@ -79,6 +79,8 @@ typedef struct{
     Mapa mapa;
     Pacman pacman;
     Fantasma *fantasmas; //vetor dinamico p/ ser mais flexivel
+    Comida comida;
+    Fruta fruta;
     int qntd_fantasmas;
     bool jogo_ativo;
     int pontuacao_atual;
@@ -86,10 +88,14 @@ typedef struct{
     Score *pontuacao;
 }Jogo;
 
-void inicalizar(Jogo *Jogo);
+void inicalizar(Jogo *jogo);
 void liberar_mapa(Mapa *m);
 void desenhar_mapa(Jogo *jogo);
 void desenhar_pacman(Pacman pacman);
+void gerar_comida(Jogo *jogo);
+void desenhar_comida(Comida comida);
+void colisao(Jogo *jogo);
+void atualizar_posi(Jogo *jogo);
 
 int main(){
 
@@ -97,14 +103,17 @@ int main(){
     inicalizar(&jogo);
 
     InitWindow(JANELA_LARGURA, JANELA_ALTURA, "Pacman com raylib em C");
-    SetTargetFPS(60);
+    SetTargetFPS(10);
 
     while(!WindowShouldClose()){
+        atualizar_posi(&jogo);
+        colisao(&jogo);
 
         BeginDrawing();
             ClearBackground(BLACK); //fundo preto
             desenhar_mapa(&jogo);
             desenhar_pacman(jogo.pacman);
+            desenhar_comida(jogo.comida);
         EndDrawing();
     }
     liberar_mapa(&jogo.mapa);
@@ -127,10 +136,12 @@ void inicalizar(Jogo *jogo){
     jogo->jogo_ativo=true;
     jogo->pontuacao_atual=0;
 
-    jogo->pacman.x=1;
+    jogo->pacman.x=2;
     jogo->pacman.y=1;
     jogo->pacman.dx=1;
     jogo->pacman.dy=0;
+
+    gerar_comida(jogo);
 }
 
 void desenhar_mapa(Jogo *jogo){
@@ -150,13 +161,76 @@ void desenhar_mapa(Jogo *jogo){
 }
 
 void desenhar_pacman(Pacman pacman){
-    
+    //converte as coordenadas da matriz em coodenadas de pixel
     float pixelX = (float)(pacman.x *TILE_SIZE);
     float pixelY = (float)(pacman.y *TILE_SIZE);
 
-    DrawCircle(pixelX + TILE_SIZE/2, pixelY + TILE_SIZE/2, TILE_SIZE/2-2, YELLOW);
+    DrawCircle(pixelX + TILE_SIZE/2, pixelY + TILE_SIZE/2, TILE_SIZE/2-1, YELLOW);
     //pixelX (onde o bloco comça), TILE_SIZE/2 (centro do bloco na horizontal), pixelX+TILE_SIZE/2 (soma do ponto inicial com o centro, onde o centro do circulo estará)
-    //TILE_SIZE/2-2 (centro do bloco - 2pixels , para definir o tamanhgo do pacman)
+    //TILE_SIZE/2-2 (centro do bloco - 1pixel , para definir o tamanhgo do pacman)
+}
+
+void desenhar_comida(Comida comida){
+    float pixelX=(float)(comida.x *TILE_SIZE);
+    float pixelY=(float)(comida.y *TILE_SIZE);
+
+    DrawCircle(pixelX + TILE_SIZE/2, pixelY + TILE_SIZE/2, TILE_SIZE/2-4, YELLOW);
+
+}
+
+void gerar_comida(Jogo *jogo){
+    Comida *comida=&jogo->comida;
+    //aleatoriedade
+    int novoX = rand() % (LARGURA-2) + 1; 
+    int novoY = rand() % (ALTURA-2) + 1;
+
+    if(jogo->mapa.mapa[novoY][novoX]=='#'){
+        gerar_comida(jogo);
+    }else{
+        comida->x=novoX;
+        comida->y=novoY;
+    }
+}
+
+void colisao(Jogo *jogo){
+    Pacman *pacman=&jogo->pacman;
+    Comida *comida=&jogo->comida;
+    
+    int proximoX = pacman->x + pacman->dx;
+    int proximoY = pacman->y + pacman->dy;
+
+    //detectar parede
+    if(proximoX >=0 && proximoX < LARGURA && proximoY>=0 && proximoY<ALTURA &&
+    jogo->mapa.mapa[proximoY][proximoX]!='#'){
+        pacman->x = proximoX;
+        pacman->y = proximoY;
+    }
+    
+    //detectar comida
+    if(proximoX==comida->x && proximoY==comida->y){
+        jogo->pontuacao_atual+=10;
+        gerar_comida(jogo);
+    }
+
+}
+
+void atualizar_posi(Jogo *jogo){
+    Pacman *pacman = &jogo->pacman;
+    
+    if(IsKeyDown(KEY_RIGHT)){
+        pacman->dx=1;
+        pacman->dy=0;
+    }else if(IsKeyDown(KEY_LEFT)){
+        pacman->dx=-1;
+        pacman->dy=0;
+    }else if(IsKeyDown(KEY_UP)){
+        pacman->dx=0;
+        pacman->dy=-1;
+    }else if(IsKeyDown(KEY_DOWN)){
+        pacman->dx=0;
+        pacman->dy=1;
+    }
+
 }
 
 void liberar_mapa(Mapa *m){
