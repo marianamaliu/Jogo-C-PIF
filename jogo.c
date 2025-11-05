@@ -89,15 +89,16 @@ typedef struct{
 }Jogo;
 
 void inicalizar(Jogo *jogo);
-void liberar_mapa(Mapa *m);
 void desenhar_mapa(Jogo *jogo);
 void desenhar_pacman(Pacman pacman);
 void desenhar_comida(Comida comida);
 void desenhar_fruta(Fruta fruta);
+void desenhar_fantasma(Fantasma fantasma, Color CorFantasma);
 void gerar_comida(Jogo *jogo);
 void gerar_fruta(Jogo *jogo);
 void colisao(Jogo *jogo);
 void atualizar_posi(Jogo *jogo);
+void liberar(Jogo *jogo);
 
 int main(){
 
@@ -108,25 +109,37 @@ int main(){
     SetTargetFPS(10);
 
     while(!WindowShouldClose()){
-        atualizar_posi(&jogo);
-        colisao(&jogo);
+        //if criado para verificar se vai ser GameOver
+        if(jogo.jogo_ativo){
+            atualizar_posi(&jogo);
+            colisao(&jogo);
+        }
 
         BeginDrawing();
             ClearBackground(BLACK); //fundo preto
-            desenhar_mapa(&jogo);
-            desenhar_pacman(jogo.pacman);
-            desenhar_comida(jogo.comida);
-            desenhar_fruta(jogo.fruta);
+
+            if(jogo.jogo_ativo){
+                desenhar_mapa(&jogo);
+                desenhar_pacman(jogo.pacman);
+                desenhar_comida(jogo.comida);
+                desenhar_fruta(jogo.fruta);
+
+                for(int i=0; i<jogo.qntd_fantasmas; i++){
+                    desenhar_fantasma(jogo.fantasmas[i], PINK);
+                }
+            }else{
+                DrawText("GAME OVER!", JANELA_LARGURA/2-100, JANELA_ALTURA/2-20, 40, RED);
+            }
+            
         EndDrawing();
     }
-    liberar_mapa(&jogo.mapa);
+    liberar(&jogo);
     CloseWindow();
-
-
     return 0;
 }
 
 void inicalizar(Jogo *jogo){
+    //Mapa
     jogo->mapa.largura = LARGURA;
     jogo->mapa.altura = ALTURA;
     jogo->mapa.mapa = (char**)malloc(ALTURA*sizeof(char*)); //alocar a memoria
@@ -139,10 +152,17 @@ void inicalizar(Jogo *jogo){
     jogo->jogo_ativo=true;
     jogo->pontuacao_atual=0;
 
+    //Pacman
     jogo->pacman.x=2;
     jogo->pacman.y=1;
     jogo->pacman.dx=1;
     jogo->pacman.dy=0;
+
+    //Fantasmas
+    jogo->qntd_fantasmas=1;
+    jogo->fantasmas=(Fantasma*)malloc((jogo->qntd_fantasmas)*sizeof(Fantasma));
+    jogo->fantasmas[0].x=20; //posição inicial
+    jogo->fantasmas[0].y =8; //posição inicial
 
     gerar_comida(jogo);
     gerar_fruta(jogo);
@@ -201,6 +221,36 @@ void desenhar_fruta(Fruta fruta){
     //brilho da cereja
     DrawCircle(centroX - raio_cereja - raio_cereja/4, centroY + raio_cereja - raio_cereja/4, raio_cereja/4, WHITE);
     DrawCircle(centroX + raio_cereja - raio_cereja/4, centroY + raio_cereja - raio_cereja/4, raio_cereja/4, WHITE);
+}
+
+void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
+    float pixelX=(float)(fantasma.x*TILE_SIZE);
+    float pixelY=(float)(fantasma.y*TILE_SIZE);
+
+    int centroX=pixelX + TILE_SIZE/2;
+    int centroY= pixelY + TILE_SIZE/2;
+    int raiocorpo = TILE_SIZE/2-2;
+
+    //"tronco" do fantasma
+    DrawRectangle(pixelX + 1, pixelY +raiocorpo, TILE_SIZE-2, raiocorpo, CorFantasma);
+    //cabeça do fantasma
+    DrawCircle(centroX, pixelY + raiocorpo, raiocorpo, CorFantasma);
+    //ondulação do fantasma
+    for (int i = 0; i < 4; i++) {
+        // Triângulo que forma a parte inferior ondulada 
+        //Vector2 = vértices do triângulo
+        Vector2 p1 = { pixelX + (i * (TILE_SIZE / 4)), pixelY + TILE_SIZE - 2 };
+        Vector2 p2 = { pixelX + ((i + 1) * (TILE_SIZE / 4)), pixelY + TILE_SIZE - 2 };
+        Vector2 p3 = { pixelX + (i * (TILE_SIZE / 4)) + (TILE_SIZE / 8), pixelY + TILE_SIZE - 2 - (TILE_SIZE / 4) };
+
+        DrawTriangle(p1, p2, p3, CorFantasma);
+    }
+    // Olho Esquerdo
+    DrawCircle(centroX - TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 8, WHITE);
+    DrawCircle(centroX - TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 16, BLACK);
+    // Olho Direito
+    DrawCircle(centroX + TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 8, WHITE);
+    DrawCircle(centroX + TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 16, BLACK);
 }
 
 void gerar_comida(Jogo *jogo){
@@ -268,6 +318,16 @@ void colisao(Jogo *jogo){
         gerar_fruta(jogo);
     }
 
+    //detectar fantasma
+    //for para garantir que a colisao seja detectada em cada fantasma
+    for(int i=0; i<jogo->qntd_fantasmas; i++){
+        Fantasma *fantasma = &jogo->fantasmas[i]; 
+        
+        //posição onde o pacman acabou de chegar
+        if(pacman->x==fantasma->x && pacman->y==fantasma->y){
+            jogo->jogo_ativo=false;
+        }
+    }
 }
 
 void atualizar_posi(Jogo *jogo){
@@ -287,12 +347,18 @@ void atualizar_posi(Jogo *jogo){
         pacman->dy=1;
     }
 
+    //Fantasma ficar se mexendo aleatoriamente;
 }
 
-void liberar_mapa(Mapa *m){
-    for(int i=0; i<m->altura; i++){
-        free(m->mapa[i]);
+void liberar(Jogo *jogo){
+    for(int i=0; i<jogo->mapa.altura; i++){
+        free(jogo->mapa.mapa[i]);
     }
-    free(m->mapa);
-    m->mapa=NULL;
+    free(jogo->mapa.mapa);
+    jogo->mapa.mapa=NULL;
+
+    if(jogo->fantasmas!=NULL){
+        free(jogo->fantasmas);
+        jogo->fantasmas=NULL;
+    }
 }
