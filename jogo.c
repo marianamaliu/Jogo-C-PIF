@@ -46,6 +46,7 @@ typedef enum{
 typedef struct{
     int x, y; //posicao do pacman
     int dx, dy; //direcao
+    int boca_aberta;
 }Pacman;
 
 typedef struct{
@@ -97,7 +98,8 @@ void desenhar_fantasma(Fantasma fantasma, Color CorFantasma);
 void gerar_comida(Jogo *jogo);
 void gerar_fruta(Jogo *jogo);
 void colisao(Jogo *jogo);
-void atualizar_posi(Jogo *jogo);
+void atualizar_pacman(Jogo *jogo);
+void atualizar_fantasma(Jogo *jogo);
 void liberar(Jogo *jogo);
 
 int main(){
@@ -111,7 +113,8 @@ int main(){
     while(!WindowShouldClose()){
         //if criado para verificar se vai ser GameOver
         if(jogo.jogo_ativo){
-            atualizar_posi(&jogo);
+            atualizar_pacman(&jogo);
+            atualizar_fantasma(&jogo); 
             colisao(&jogo);
         }
 
@@ -163,6 +166,8 @@ void inicalizar(Jogo *jogo){
     jogo->fantasmas=(Fantasma*)malloc((jogo->qntd_fantasmas)*sizeof(Fantasma));
     jogo->fantasmas[0].x=20; //posição inicial
     jogo->fantasmas[0].y =8; //posição inicial
+    jogo->fantasmas[0].dx=-1;
+    jogo->fantasmas[0].dy=0;
 
     gerar_comida(jogo);
     gerar_fruta(jogo);
@@ -189,9 +194,29 @@ void desenhar_pacman(Pacman pacman){
     float pixelX = (float)(pacman.x *TILE_SIZE);
     float pixelY = (float)(pacman.y *TILE_SIZE);
 
-    DrawCircle(pixelX + TILE_SIZE/2, pixelY + TILE_SIZE/2, TILE_SIZE/2-1, YELLOW);
-    //pixelX (onde o bloco comça), TILE_SIZE/2 (centro do bloco na horizontal), pixelX+TILE_SIZE/2 (soma do ponto inicial com o centro, onde o centro do circulo estará)
-    //TILE_SIZE/2-2 (centro do bloco - 1pixel , para definir o tamanhgo do pacman)
+    Vector2 center={pixelX +TILE_SIZE/2, pixelY +TILE_SIZE/2};
+    float raio = TILE_SIZE/2-1;
+
+    float startAngle = 0.0f;
+    float endAngle = 360.0f;
+    float abertura_boca = 25.0f;
+    float angulo_central = 0.0f;
+
+    if(pacman.dx==1){
+        angulo_central=0.0f; //direita
+    }else if(pacman.dx==-1){
+        angulo_central=180.0f; //esquerda
+    }else if(pacman.dy==1){
+        angulo_central=90.0f; //baixo
+    }else if(pacman.dy=-1){
+        angulo_central=270.0f; //cima
+    }
+
+    //cacula o angulo da abertura
+    startAngle = angulo_central - abertura_boca;
+    endAngle = angulo_central + abertura_boca;
+
+    DrawCircleSector(center, raio, endAngle, startAngle + 360, 0, YELLOW);
 }
 
 void desenhar_comida(Comida comida){
@@ -253,6 +278,7 @@ void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
     DrawCircle(centroX + TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 16, BLACK);
 }
 
+//AJUSTAR GERAR COMIDA E GERAR FRUTA PARA NAO APARECER ENTRE AS PAREDES
 void gerar_comida(Jogo *jogo){
     Comida *comida=&jogo->comida;
     //aleatoriedade
@@ -285,7 +311,7 @@ void gerar_fruta(Jogo *jogo){
     }
 }
 
-void colisao(Jogo *jogo){
+void colisao(Jogo *jogo){ 
     Pacman *pacman=&jogo->pacman;
     Comida *comida=&jogo->comida;
     Fruta *fruta=&jogo->fruta;
@@ -318,7 +344,7 @@ void colisao(Jogo *jogo){
         gerar_fruta(jogo);
     }
 
-    //detectar fantasma
+    //detectar fantasma 
     //for para garantir que a colisao seja detectada em cada fantasma
     for(int i=0; i<jogo->qntd_fantasmas; i++){
         Fantasma *fantasma = &jogo->fantasmas[i]; 
@@ -330,7 +356,7 @@ void colisao(Jogo *jogo){
     }
 }
 
-void atualizar_posi(Jogo *jogo){
+void atualizar_pacman(Jogo *jogo){
     Pacman *pacman = &jogo->pacman;
     
     if(IsKeyDown(KEY_RIGHT)){
@@ -346,8 +372,49 @@ void atualizar_posi(Jogo *jogo){
         pacman->dx=0;
         pacman->dy=1;
     }
+}
 
-    //Fantasma ficar se mexendo aleatoriamente;
+//fantasma sem seguir
+void atualizar_fantasma(Jogo *jogo){
+    for(int i = 0; i < jogo->qntd_fantasmas; i++){
+        Fantasma *fantasma = &jogo->fantasmas[i];
+
+        int proximoX = fantasma->x + fantasma->dx;
+        int proximoY = fantasma->y + fantasma->dy;
+        
+        //colisao c a parede
+        bool colisao_parede = (proximoY < 0 || proximoY >= ALTURA || proximoX < 0 || proximoX >= LARGURA 
+                                || jogo->mapa.mapa[proximoY][proximoX] == '#');
+
+        if (colisao_parede || (rand() % 5 == 0)) { //esse rand faz ele alterar tambem caso nao tenha uma parede, ele tem 1 chance em 5 de alterar
+            int direcao_valida = 0; 
+            
+            while (direcao_valida==0) {
+                int sorteio_direcao = rand() % 4; 
+                //sorteia um num de 0 a 3 (cima, baixo, direita e esquerda)
+                
+                fantasma->dx = 0; //isso serve para resetar a direcao atual antes de sortear a nova
+                fantasma->dy = 0;
+                switch (sorteio_direcao) {
+                    case 0: fantasma->dx = 1; break;  // direita
+                    case 1: fantasma->dx = -1; break; // esquerda
+                    case 2: fantasma->dy = 1; break;  // baixo
+                    case 3: fantasma->dy = -1; break; // cima
+                }
+
+                //recalcular a prox direcao depois de trocar de direcao
+                proximoX = fantasma->x + fantasma->dx;
+                proximoY = fantasma->y + fantasma->dy;
+
+                if (proximoY >= 0 && proximoY < ALTURA && proximoX >= 0 && proximoX < LARGURA && 
+                    jogo->mapa.mapa[proximoY][proximoX] != '#') {
+                    direcao_valida = 1; //o loop so para qnd ele acha uma nova direcao
+                }
+            }
+        } 
+        fantasma->x = fantasma->x + fantasma->dx;
+        fantasma->y = fantasma->y + fantasma->dy; 
+    }
 }
 
 void liberar(Jogo *jogo){
