@@ -6,7 +6,7 @@
 #include <raylib.h>
 
 #define ALTURA 22
-#define LARGURA 41
+#define LARGURA 40
 #define TILE_SIZE 20 //tamanho em pixels de cada bloco na tela
 #define JANELA_LARGURA (LARGURA*TILE_SIZE) //calcula a largura total da janela em pixels
 #define JANELA_ALTURA (ALTURA*TILE_SIZE) //calcula a altura total da janela em pixels
@@ -83,11 +83,13 @@ typedef struct{
     Fantasma *fantasmas; //vetor dinamico p/ ser mais flexivel
     Comida comida;
     Fruta fruta;
+    Score score;
     int qntd_fantasmas;
     bool jogo_ativo;
     int pontuacao_atual;
-
-    Score *pontuacao;
+    int pontoComida;
+    int maxComida; //qntd de comida p aparecer a fruta
+    bool inicializarFruta;
 }Jogo;
 
 void inicalizar(Jogo *jogo);
@@ -126,7 +128,10 @@ int main(){
                 desenhar_mapa(&jogo);
                 desenhar_pacman(jogo.pacman);
                 desenhar_comida(jogo.comida);
-                desenhar_fruta(jogo.fruta);
+                
+                if(jogo.inicializarFruta){
+                    desenhar_fruta(jogo.fruta);
+                }
 
                 for(int i=0; i<jogo.qntd_fantasmas; i++){
                     desenhar_fantasma(jogo.fantasmas[i], jogo.fantasmas[i].cor);
@@ -155,6 +160,9 @@ void inicalizar(Jogo *jogo){
 
     jogo->jogo_ativo=true;
     jogo->pontuacao_atual=0;
+    jogo->pontoComida=0;
+    jogo->maxComida=50;
+    jogo->inicializarFruta=false;
 
     //Pacman
     jogo->pacman.x=2;
@@ -179,7 +187,7 @@ void inicalizar(Jogo *jogo){
     }
 
     gerar_comida(jogo);
-    gerar_fruta(jogo);
+    //gerar_fruta(jogo);
 }
 
 void desenhar_mapa(Jogo *jogo){
@@ -320,6 +328,7 @@ void gerar_comida(Jogo *jogo){
     //se for na parede, ele sorteia os valores de novo ate nao ser na parede
     if(jogo->mapa.mapa[novoY][novoX]=='#'){
         gerar_comida(jogo);
+        
     }else{
         comida->x=novoX;
         comida->y=novoY;
@@ -338,6 +347,7 @@ void gerar_fruta(Jogo *jogo){
     if(jogo->mapa.mapa[novoY][novoX]=='#' || jogo->mapa.mapa[novoY][novoX]==comida->x && jogo->mapa.mapa[novoY][novoX]==comida->y){
         gerar_fruta(jogo);
     }else{
+        jogo->inicializarFruta=true;
         fruta->x=novoX;
         fruta->y=novoY;
     }
@@ -358,7 +368,7 @@ void colisao(Jogo *jogo){
         pacman->y = proximoY;
 
         //detectar bolinhas menores
-        if(jogo->mapa.mapa[proximoY][proximoX]=' '){
+        if(jogo->mapa.mapa[proximoY][proximoX]==' '){
             jogo->mapa.mapa[proximoY][proximoX]='.'; //ele desenha a bolinha, entao quando vai para a função desenhar, o espaço nao esta mais vazio,
             //entao ele nao desenha a bolinha amarela
         }
@@ -367,13 +377,19 @@ void colisao(Jogo *jogo){
     //detectar comida
     if(proximoX==comida->x && proximoY==comida->y){
         jogo->pontuacao_atual+=10;
+        jogo->pontoComida+=10;
+
+        if(!jogo->inicializarFruta && jogo->pontoComida>=jogo->maxComida){
+            gerar_fruta(jogo); //se pegar 5 bolinhas (50 pontos)
+            jogo->pontoComida=0;
+        }
         gerar_comida(jogo);
     }
 
     //detectar fruta
-    if(proximoX==fruta->x && proximoY==fruta->y){
+    if(jogo->inicializarFruta && proximoX==fruta->x && proximoY==fruta->y){
         jogo->pontuacao_atual+=50;
-        gerar_fruta(jogo);
+        jogo->inicializarFruta=false;
     }
 
     //detectar fantasma 
