@@ -37,8 +37,8 @@ void gerar_comida(Jogo *jogo){
     int novoX = rand() % (LARGURA-2) + 1; 
     int novoY = rand() % (ALTURA-2) + 1;
 
-    //se for na parede, ele sorteia os valores de novo ate nao ser na parede
-    if(jogo->mapa.mapa[novoY][novoX]=='#' || jogo->mapa.mapa[novoY][novoX]!='.'){ //ainda ta aparecendo entre
+    //se for na parede ou se nao for onde tem '.', ele sorteia os valores de novo ate nao ser na parede
+    if(jogo->mapa.mapa[novoY][novoX]=='#' || jogo->mapa.mapa[novoY][novoX]!='.'){ 
         gerar_comida(jogo);
         
     }else{
@@ -55,8 +55,8 @@ void gerar_fruta(Jogo *jogo){
     int novoX=rand()%(LARGURA-2)+1;
     int novoY=rand()%(ALTURA-1)+1;
 
-    //se for parede ou se for onde ja tem comida, ele gera de novo ate nao ser parede ou nao ter comida
-    if(jogo->mapa.mapa[novoY][novoX]=='#' || jogo->mapa.mapa[novoY][novoX]==comida->x && jogo->mapa.mapa[novoY][novoX]==comida->y && jogo->mapa.mapa[novoY][novoX]){
+    //se for parede ou se for onde ja tem comida ou se nao for no '.', ele gera de novo ate nao ser parede ou nao ter comida
+    if(jogo->mapa.mapa[novoY][novoX]=='#' || jogo->mapa.mapa[novoY][novoX]==comida->x && jogo->mapa.mapa[novoY][novoX]==comida->y && jogo->mapa.mapa[novoY][novoX]!='.'){
         gerar_fruta(jogo);
     }else{
         jogo->inicializarFruta=true;

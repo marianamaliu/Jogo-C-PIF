@@ -104,7 +104,8 @@ void colisao(Jogo *jogo){
         Fantasma *fantasma = &jogo->fantasmas[i]; 
         
         //posição onde o pacman acabou de chegar
-        if(pacman->x==fantasma->x && pacman->y==fantasma->y){
+        if(pacman->x==fantasma->x && pacman->y==fantasma->y || 
+            proximoX==fantasma->x && proximoY==fantasma->y){
             jogo->jogo_ativo=false;
         }
     }
