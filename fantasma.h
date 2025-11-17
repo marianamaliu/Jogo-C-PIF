@@ -2,10 +2,10 @@
 #define FANTASMA_H
 
 #include <raylib.h>
-#include <stdlib.h>
 #include "config.h"
 
 void desenhar_fantasma(Fantasma fantasma, Color CorFantasma);
 void atualizar_fantasma(Jogo *jogo);
+void ativar_modo_assustado(Jogo *jogo);
 
-#endif
+#endif // FANTASMA_H

@@ -1,58 +1,59 @@
-#ifndef STRUCT_H
-#define STRUCT_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 #include <raylib.h>
+#include <stdbool.h>
 
 #define ALTURA 22
 #define LARGURA 40
-#define TILE_SIZE 20 //tamanho em pixels de cada bloco na tela
-#define JANELA_LARGURA (LARGURA*TILE_SIZE) //calcula a largura total da janela em pixels
-#define JANELA_ALTURA (ALTURA*TILE_SIZE) //calcula a altura total da janela em pixels
+#define TILE_SIZE 20
+#define JANELA_LARGURA (LARGURA * TILE_SIZE)
+#define JANELA_ALTURA (ALTURA * TILE_SIZE)
 #define GROSSURA_LINHA 2
 
-typedef enum{
+typedef enum {
     PERSEGUIR,
     ESPALHAR,
     ASSUSTADO,
-}ModoFantasma;
+} ModoFantasma;
 
-typedef struct{
-    int x, y; //posicao do pacman
-    int dx, dy; //direcao
-}Pacman;
+typedef struct {
+    int x, y;
+    int dx, dy;
+} Pacman;
 
-typedef struct{
-    int x, y; //posicao do fantasma
-    int dx, dy; //direcao
+typedef struct {
+    int x, y;
+    int dx, dy;
     ModoFantasma modo;
     Color cor;
-}Fantasma;
+    float velocidade;   // multiplicador de velocidade (1.0 normal, 0.5 assustado)
+    float timer_modo;   // temporizador para modos como ASSUSTADO
+} Fantasma;
 
-typedef struct{
-    int x;
-    int y;
-}Comida;
+typedef struct {
+    int x, y;
+} Comida;
 
-typedef struct{
-    int x;
-    int y;
-}Fruta;
+typedef struct {
+    int x, y;
+} Fruta;
 
-typedef struct{
+typedef struct {
     int largura;
-    int altura; 
-    char **mapa; //mapa[altura][largura]
-}Mapa;
+    int altura;
+    char **mapa;
+} Mapa;
 
-typedef struct Score{
+typedef struct Score {
     int pontos;
     struct Score *next;
-}Score;
+} Score;
 
-typedef struct{
+typedef struct {
     Mapa mapa;
     Pacman pacman;
-    Fantasma *fantasmas; //vetor dinamico p/ ser mais flexivel
+    Fantasma *fantasmas;
     Comida comida;
     Fruta fruta;
     Score score;
@@ -60,8 +61,8 @@ typedef struct{
     bool jogo_ativo;
     int pontuacao_atual;
     int pontoComida;
-    int maxComida; //qntd de comida p aparecer a fruta
+    int maxComida;
     bool inicializarFruta;
-}Jogo;
+} Jogo;
 
-#endif
+#endif // CONFIG_H
