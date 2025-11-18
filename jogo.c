@@ -11,6 +11,7 @@
 #include "fantasma.h"
 #include "itens.h"
 
+#define SCORE_MAX "score_max.dat"
 
 static const char *MAPA[ALTURA] = { //layout do labirinto; cada elemento do array é um ponteiro p um caractere; 
     //cada ponteiro aponta para o inicio de uma linha do labirinto
@@ -20,11 +21,11 @@ static const char *MAPA[ALTURA] = { //layout do labirinto; cada elemento do arra
     "#..#  #....#    #...#...#    #...#  #..#",
     "#..####....######.......######...####..#",
     "#......................................#",
-    "#..####....###.............###...####..#",
-    "#..#  #....# ####.......#### #...#  #..#",
-    "#..####....#    #.......#    #...####..#",
-    "#..........# ####.......#### #.........#",
-    "#..####....# #......#......# #...####..#",
+    "#..####....####..###G###..####...####..#",
+    "#..#  #....# ### #     # ### #...#  #..#",
+    "#..####....#   # #     # #   #...####..#",
+    "#..........# ### ####### ### #.........#",
+    "#..####....# #.............# #...####..#",
     "#..........###......#......###.........#",
     "#...................#..................#",
     "#..####....######...#...######...####..#",
@@ -40,8 +41,9 @@ static const char *MAPA[ALTURA] = { //layout do labirinto; cada elemento do arra
 
 
 void inicalizar(Jogo *jogo);
-void atualizar_pacman(Jogo *jogo);
-void atualizar_fantasma(Jogo *jogo);
+void inicializar_nivel(Jogo *jogo);
+void desenhar_placar(Jogo *jogo);
+void Score_max(Jogo *jogo, int pontuacao_atual);
 void liberar(Jogo *jogo);
 
 int main(){
@@ -71,16 +73,39 @@ int main(){
                 desenhar_mapa(&jogo);
                 desenhar_pacman(jogo.pacman);
                 desenhar_comida(jogo.comida);
+                desenhar_placar(&jogo);
                 
                 if(jogo.inicializarFruta){
-                    desenhar_fruta(jogo.fruta);
+                    desenhar_fruta(&jogo);
                 }
 
                 for(int i=0; i<jogo.qntd_fantasmas; i++){
                     desenhar_fantasma(jogo.fantasmas[i], jogo.fantasmas[i].cor);
                 }
             }else{
-                DrawText("GAME OVER!", JANELA_LARGURA/2-100, JANELA_ALTURA/2-20, 40, RED);
+
+                Score_max(&jogo, jogo.pontuacao_atual);
+
+                DrawText("GAME OVER!", JANELA_LARGURA/2 - MeasureText("GAME OVER!", 40)/2, JANELA_ALTURA/4, 40, RED);
+
+                char score_text[50];
+                char high_score_text[50];
+                
+                sprintf(score_text, "SEU SCORE: %d", jogo.pontuacao_atual);
+                sprintf(high_score_text, "HIGH SCORE: %d", jogo.pontuacao_max);
+
+                DrawText(score_text, JANELA_LARGURA/2 - MeasureText(score_text, 25)/2, JANELA_ALTURA/2, 25, YELLOW);
+                DrawText(high_score_text, JANELA_LARGURA/2 - MeasureText(high_score_text, 25)/2, JANELA_ALTURA/2 + 40, 25, WHITE);
+
+                DrawText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 
+                         JANELA_LARGURA/2 - MeasureText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 20)/2, 
+                         JANELA_ALTURA/2 + 100, 20, GREEN);
+                
+                if(IsKeyPressed(KEY_ENTER)){
+                    MostrarTelaInicial(fundoMenu);
+                    liberar(&jogo);
+                    inicalizar(&jogo);
+                }
             }
             
         EndDrawing();
@@ -88,6 +113,32 @@ int main(){
     liberar(&jogo);
     CloseWindow();
     return 0;
+}
+
+void inicializar_nivel(Jogo *jogo){
+    jogo->niveis[0].cor_mapa=DARKBLUE;
+    jogo->niveis[0].velocidade=0.8f;
+    jogo->niveis[0].fruta_nivel=CEREJA;
+    jogo->niveis[0].caixa_x=18;
+    jogo->niveis[0].caixa_y=7;
+    jogo->niveis[0].caixa_largura=6;
+    jogo->niveis[0].caixa_altura=3;
+
+    jogo->niveis[1].cor_mapa=MAGENTA;
+    jogo->niveis[1].velocidade=1.2f;
+    jogo->niveis[1].fruta_nivel=MORANGO;
+    jogo->niveis[1].caixa_x=18;
+    jogo->niveis[1].caixa_y=7;
+    jogo->niveis[1].caixa_largura=5;
+    jogo->niveis[1].caixa_altura=3;
+
+    jogo->niveis[2].cor_mapa=GREEN;
+    jogo->niveis[2].velocidade=1.5f;
+    jogo->niveis[2].fruta_nivel=MORANGO;
+    jogo->niveis[2].caixa_x=18;
+    jogo->niveis[2].caixa_y=7;
+    jogo->niveis[2].caixa_largura=5;
+    jogo->niveis[2].caixa_altura=4;
 }
 
 void inicalizar(Jogo *jogo){
@@ -103,9 +154,13 @@ void inicalizar(Jogo *jogo){
 
     jogo->jogo_ativo=true;
     jogo->pontuacao_atual=0;
+    Score_max(jogo, 0);
     jogo->pontoComida=0;
     jogo->maxComida=50;
     jogo->inicializarFruta=false;
+    jogo->nivel_atual=0;
+
+    inicializar_nivel(jogo);
 
     //Pacman
     jogo->pacman.x=2;
@@ -120,9 +175,13 @@ void inicalizar(Jogo *jogo){
     Color cor_fantasma[]={RED, PINK, ORANGE, SKYBLUE};
     int total_cores=sizeof(cor_fantasma)/sizeof(cor_fantasma[0]);
 
+    Nivel nivel_inicial = jogo->niveis[0];
+    int spawn_x = nivel_inicial.caixa_x + 1; 
+    int spawn_y = nivel_inicial.caixa_y + 1;
+
     for(int i=0; i<jogo->qntd_fantasmas; i++){
-        jogo->fantasmas[i].x=20 + i; //posição inicial
-        jogo->fantasmas[i].y =8; //posição inicial
+        jogo->fantasmas[i].x=spawn_x+ i; //posição inicial
+        jogo->fantasmas[i].y =spawn_y; //posição inicial
         jogo->fantasmas[i].dx=-1;
         jogo->fantasmas[i].dy=0;
 
@@ -131,6 +190,48 @@ void inicalizar(Jogo *jogo){
 
     gerar_comida(jogo);
     //gerar_fruta(jogo);
+}
+
+void desenhar_placar(Jogo *jogo) {
+    char score_buffer[32];
+    int font_size = 20; 
+
+    int placar_y = TILE_SIZE / 2; 
+
+    //score Atual
+    sprintf(score_buffer, "SCORE: %d", jogo->pontuacao_atual);
+    DrawText(score_buffer, TILE_SIZE, placar_y, font_size, YELLOW);
+}
+
+void Score_max(Jogo *jogo, int pontuacao_atual) {
+    int recorde_salvo = 0;
+    FILE *arquivo = NULL;
+
+    arquivo = fopen(SCORE_MAX, "rb"); //tenta abrir para leitura binária
+    
+    if (arquivo != NULL) {
+        if (fread(&recorde_salvo, sizeof(int), 1, arquivo) != 1) {
+            recorde_salvo = 0; 
+        }
+        fclose(arquivo);
+    }
+    
+    if (recorde_salvo > jogo->pontuacao_max) {
+        jogo->pontuacao_max = recorde_salvo;
+    }
+
+    if (jogo->pontuacao_atual > jogo->pontuacao_max) {
+        
+        jogo->pontuacao_max = jogo->pontuacao_atual;
+        recorde_salvo = jogo->pontuacao_atual; //atualiza o valor 
+        // Salvar o novo recorde
+        arquivo = fopen(SCORE_MAX, "wb"); //sobrescreve
+        
+        if (arquivo != NULL) {
+            fwrite(&recorde_salvo, sizeof(int), 1, arquivo);
+            fclose(arquivo);
+        }
+    }
 }
 
 void liberar(Jogo *jogo){

@@ -1,4 +1,6 @@
 #include "fantasma.h"
+static float tempo_acumulado_fantasma = 0.0f;
+#define TEMPO_BASE_MOVIMENTO 0.1f
 
 void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
     float pixelX=(float)(fantasma.x*TILE_SIZE);
@@ -33,7 +35,16 @@ void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
 //atualizar movimentação
 //fantasma sem seguir
 void atualizar_fantasma(Jogo *jogo){
-    for(int i = 0; i < jogo->qntd_fantasmas; i++){
+    float delta_tempo = GetFrameTime();
+    tempo_acumulado_fantasma += delta_tempo;
+
+    float multiplicador=jogo->niveis[jogo->nivel_atual].velocidade;
+    float tempo_movimento=TEMPO_BASE_MOVIMENTO/multiplicador;
+
+    while(tempo_acumulado_fantasma >= tempo_movimento){
+        tempo_acumulado_fantasma -= tempo_movimento;
+
+        for(int i = 0; i < jogo->qntd_fantasmas; i++){
         Fantasma *fantasma = &jogo->fantasmas[i];
 
         int proximoX = fantasma->x + fantasma->dx;
@@ -71,5 +82,6 @@ void atualizar_fantasma(Jogo *jogo){
         } 
         fantasma->x = fantasma->x + fantasma->dx;
         fantasma->y = fantasma->y + fantasma->dy; 
+        }
     }
 }

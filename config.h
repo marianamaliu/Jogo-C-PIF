@@ -11,9 +11,11 @@
 #define GROSSURA_LINHA 2
 
 typedef enum{
-    PERSEGUIR,
-    ESPALHAR,
-    ASSUSTADO,
+    FANTASMA_SEGUIR,
+    FANTASMA_ESPALHAR,
+    FANTASMA_CEGO,
+    FANTASMA_NA_CAIXA,
+    FANTASMA_VOLTANDO_CAIXA,
 }ModoFantasma;
 
 typedef struct{
@@ -26,6 +28,10 @@ typedef struct{
     int dx, dy; //direcao
     ModoFantasma modo;
     Color cor;
+    int id; //cada fantasma
+    int tempo_para_sair; //tempo p sair da caixa
+    int alvo_x;
+    int alvo_y; 
 }Fantasma;
 
 typedef struct{
@@ -33,9 +39,16 @@ typedef struct{
     int y;
 }Comida;
 
+typedef enum{
+    CEREJA,
+    MORANGO,
+    LARANJA
+}TipoFruta;
+
 typedef struct{
     int x;
     int y;
+    TipoFruta tipo;
 }Fruta;
 
 typedef struct{
@@ -50,6 +63,17 @@ typedef struct Score{
 }Score;
 
 typedef struct{
+    char **matriz;
+    Color cor_mapa;
+    float velocidade; //p aumentar a velocidade dos fantasmas
+    int caixa_x; //onde os fantasmas reaparecem no mapa
+    int caixa_y;
+    int caixa_largura;
+    int caixa_altura;
+    TipoFruta fruta_nivel;
+}Nivel;
+
+typedef struct{
     Mapa mapa;
     Pacman pacman;
     Fantasma *fantasmas; //vetor dinamico p/ ser mais flexivel
@@ -59,9 +83,15 @@ typedef struct{
     int qntd_fantasmas;
     bool jogo_ativo;
     int pontuacao_atual;
+    int pontuacao_max;
     int pontoComida;
     int maxComida; //qntd de comida p aparecer a fruta
     bool inicializarFruta;
+    
+    Nivel niveis[3];
+    int nivel_atual;
+    int vidas;
+    int tempo_cego; //contador p o fantasma cego
 }Jogo;
 
 #endif
