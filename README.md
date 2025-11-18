@@ -9,9 +9,9 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
   
   [![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://youtu.be/Gl9CCqlGOZM?si=fnIdJcxA8zisIat-)
 
-- Baixar a Biblioteca `CLI LIB` para utilizar as funções : `Keyboard`/`Time`/`Screen`
+- Baixar a Biblioteca `RAYLIB` para utilizar as funções disponibilizadas
   ``` bash
-  $ gcc ./src/*.c -I./include -o cli-lib-example
+  sudo apt install libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev build-essential cmake make g++ freeglut3-dev libglfw3 libglfw3-dev
   ```
 
   ## Desenvolvedores 💻
