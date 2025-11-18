@@ -1,9 +1,7 @@
-#ifndef TELA_INICIAL_H
-#define TELA_INICIAL_H
+#ifndef TELA_INICAL_H
+#define TELA_INICAL_H
 
 #include <raylib.h>
-#include <math.h>
-#include "config.h"
 
 void MostrarTelaInicial(Texture2D fundo);
 
