@@ -162,6 +162,9 @@ void inicalizar(Jogo *jogo){
 
     inicializar_nivel(jogo);
 
+    // seed do rand (uma vez)
+    srand((unsigned)time(NULL));
+
     //Pacman
     jogo->pacman.x=2;
     jogo->pacman.y=1;
@@ -180,17 +183,29 @@ void inicalizar(Jogo *jogo){
     int spawn_y = nivel_inicial.caixa_y + 1;
 
     for(int i=0; i<jogo->qntd_fantasmas; i++){
-        jogo->fantasmas[i].x=spawn_x+ i; //posição inicial
-        jogo->fantasmas[i].y =spawn_y; //posição inicial
-        jogo->fantasmas[i].dx=-1;
-        jogo->fantasmas[i].dy=0;
+        Fantasma *f = &jogo->fantasmas[i];
 
-        jogo->fantasmas[i].cor = cor_fantasma[i%total_cores];
+        f->id = i;                                   // importante!
+        f->x = spawn_x + i;
+        f->y = spawn_y;
+
+        // direção inicial válida (se quiser forçar outra, troque aqui)
+        f->dx = -1;
+        f->dy = 0;
+
+        f->cor = cor_fantasma[i % total_cores];
+
+        // campos necessários inicializados:
+        f->modo = FANTASMA_SEGUIR;    // pode ajustar para FANTASMA_NA_CAIXA se quiser que fiquem presos no começo
+        f->tempo_para_sair = 0;       // 0 = já pode se mover; se quiser delay, coloque >0
+        f->alvo_x = f->x;
+        f->alvo_y = f->y;
     }
 
     gerar_comida(jogo);
     //gerar_fruta(jogo);
 }
+
 
 void desenhar_placar(Jogo *jogo) {
     char score_buffer[32];
