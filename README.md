@@ -14,6 +14,15 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
   sudo apt install libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev build-essential cmake make g++ freeglut3-dev libglfw3 libglfw3-dev
   ```
 
+- Comando para compilar o jogo
+  ``` bash
+  $ gcc *.c -o jogo -lraylib -lm -lpthread -ldl -lrt -lGL -lX11
+  ```
+- Comando para executar o jogo
+  ``` bash
+  ./jogo
+  ```
+
   ## Desenvolvedores 💻
 <table align="center">
   <thead>
