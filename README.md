@@ -11,6 +11,11 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
 
 - Baixar a Biblioteca `RAYLIB` para utilizar as funções disponibilizadas
   ``` bash
+  sudo apt install libraylib-dev
+  ```
+
+- Inicializar os Compiladores na máquina virtual WSL
+  ``` bash
   sudo apt install libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev build-essential cmake make g++ freeglut3-dev libglfw3 libglfw3-dev
   ```
 
