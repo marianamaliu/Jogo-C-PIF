@@ -23,6 +23,13 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
   ./jogo
   ```
 
+## Jogo em Execução 👻
+https://github.com/user-attachments/assets/e7723d0e-b824-4748-89fb-d05876ce1d31
+
+
+
+
+
   ## Desenvolvedores 💻
 <table align="center">
   <thead>
