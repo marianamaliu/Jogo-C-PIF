@@ -49,7 +49,7 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
 
 - Comando para compilar o jogo
   ``` bash
-  gcc *.c -o jogo -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
+  gcc *.c -I/opt/homebrew/include -L/opt/homebrew/lib -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -o jogo
   ```
 - Comando para executar o jogo
   ``` bash
@@ -84,4 +84,5 @@ https://github.com/user-attachments/assets/e7723d0e-b824-4748-89fb-d05876ce1d31
 
   </tbody>
 </table>
+
 
