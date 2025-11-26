@@ -10,7 +10,6 @@
 #define JANELA_ALTURA (ALTURA*TILE_SIZE) //calcula a altura total da janela em pixels
 #define GROSSURA_LINHA 2
 
-
 typedef struct{
     int x, y; //posicao do pacman
     int dx, dy; //direcao

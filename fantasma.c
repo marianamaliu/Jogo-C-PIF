@@ -187,60 +187,50 @@ void atualizar_fantasma(Jogo *jogo) {
     while (tempo_acumulado_fantasma >= tempo_movimento) {
         tempo_acumulado_fantasma -= tempo_movimento;
 
+        // se tiver nesses 5 segundos cego
+        if(jogo->tempo_cego > 0){
+            jogo->tempo_cego--;
+        }
         for (int i = 0; i < jogo->qntd_fantasmas; i++) {
             Fantasma *f = &jogo->fantasmas[i];
 
-            /* se temporizador da caixa ativo, diminui e continua */
-            if (f->tempo_para_sair > 0) {
+            if (f->tempo_para_sair > 0) { //p o temporizador ir dominuindo
                 f->tempo_para_sair--;
                 continue;
             }
 
-            /* garante direção inicial */
+            //garantir q o fantasma tem uma direção p andar
             if (f->dx == 0 && f->dy == 0) {
                 inicializar_direcao_valida(f, jogo);
             }
 
-            /* definir alvo (comportamento individual) */
-            definir_alvo(f, jogo);
-
             int nextx = -1, nexty = -1;
-            bool ok = bfs_proximo_passo(jogo, f->x, f->y, f->alvo_x, f->alvo_y, &nextx, &nexty);
 
-            if (!ok) {
-                /* fallback: escolhe direção aleatória válida */
+            if(jogo->tempo_cego > 0){
+                // modo cego: andar aleatoriamente
                 int tent = 0;
-                int candx, candy;
                 do {
                     int d = rand() % 4;
-                    candx = f->x + DIR_X[d];
-                    candy = f->y + DIR_Y[d];
+                    nextx = f->x + DIR_X[d];
+                    nexty = f->y + DIR_Y[d];
                     tent++;
-                } while (eh_parede(jogo, candx, candy) && tent < 20);
-                nextx = candx; nexty = candy;
-            }
-
-            /* se ainda inválido, tenta manter direção antiga (se possível) */
-            if (eh_parede(jogo, nextx, nexty)) {
-                int candx = f->x + f->dx;
-                int candy = f->y + f->dy;
-                if (!eh_parede(jogo, candx, candy)) {
-                    nextx = candx; nexty = candy;
-                } else {
+                } while(eh_parede(jogo, nextx, nexty) && tent < 20);
+            } else {
+                //volta ao normal, perseguir Pac-Man
+                definir_alvo(f, jogo);
+                bool ok = bfs_proximo_passo(jogo, f->x, f->y, f->alvo_x, f->alvo_y, &nextx, &nexty);
+                if(!ok){
                     inicializar_direcao_valida(f, jogo);
                     nextx = f->x + f->dx;
                     nexty = f->y + f->dy;
                 }
             }
 
-            /* determina dx/dy relativos antes de atualizar posição */
-            int ddx = nextx - f->x;
-            int ddy = nexty - f->y;
-            f->dx = ddx;
-            f->dy = ddy;
+            //atualiza dx/dy e aplica movimento 
+            f->dx = nextx - f->x;
+            f->dy = nexty - f->y;
 
-            /* aplica movimento */
-            if (!eh_parede(jogo, nextx, nexty)) {
+            if(!eh_parede(jogo, nextx, nexty)){
                 f->x = nextx;
                 f->y = nexty;
             }
@@ -248,7 +238,6 @@ void atualizar_fantasma(Jogo *jogo) {
     }
 }
 
-/* --- desenho (seu desenho original adaptado) --- */
 void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
     float pixelX = (float)(fantasma.x * TILE_SIZE);
     float pixelY = (float)(fantasma.y * TILE_SIZE);
@@ -257,12 +246,12 @@ void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
     int centroY = (int)pixelY + TILE_SIZE/2;
     int raiocorpo = TILE_SIZE/2 - 2;
 
-    /* tronco */
+    //corpo
     DrawRectangle((int)pixelX + 1, (int)pixelY + raiocorpo, TILE_SIZE - 2, raiocorpo, CorFantasma);
-    /* cabeça */
+    //cabeca
     DrawCircle(centroX, (int)pixelY + raiocorpo, raiocorpo, CorFantasma);
 
-    /* ondulação */
+    //ondulação
     for (int i = 0; i < 4; i++) {
         Vector2 p1 = { pixelX + (i * (TILE_SIZE / 4.0f)), pixelY + TILE_SIZE - 2 };
         Vector2 p2 = { pixelX + ((i + 1) * (TILE_SIZE / 4.0f)), pixelY + TILE_SIZE - 2 };
@@ -270,10 +259,57 @@ void desenhar_fantasma(Fantasma fantasma, Color CorFantasma){
         DrawTriangle(p1, p2, p3, CorFantasma);
     }
 
-    /* olhos */
+    //olho
     DrawCircle(centroX - TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 8, WHITE);
     DrawCircle(centroX - TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 16, BLACK);
 
     DrawCircle(centroX + TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 8, WHITE);
     DrawCircle(centroX + TILE_SIZE / 6, centroY - TILE_SIZE / 4, TILE_SIZE / 16, BLACK);
+}
+
+void desenhar_fantasma_cego(Fantasma fantasma){
+    float pixelX = (float)(fantasma.x * TILE_SIZE);
+    float pixelY = (float)(fantasma.y * TILE_SIZE);
+
+    int centroX = (int)pixelX + TILE_SIZE/2;
+    int centroY = (int)pixelY + TILE_SIZE/2;
+    int raiocorpo = TILE_SIZE/2 - 2;
+
+    Color cegoCor = BLUE; 
+
+    //corpo e cabeça
+    DrawRectangle((int)pixelX + 1, (int)pixelY + raiocorpo, TILE_SIZE - 2, raiocorpo, cegoCor);
+    DrawCircle(centroX, (int)pixelY + raiocorpo, raiocorpo, cegoCor);
+
+    //ondulaçao de baixo
+    int nOndas = 4;
+    for (int i = 0; i < nOndas; i++) {
+        Vector2 p1 = { pixelX + (i * (TILE_SIZE / (float)nOndas)), pixelY + TILE_SIZE - 2 };
+        Vector2 p2 = { pixelX + ((i + 1) * (TILE_SIZE / (float)nOndas)), pixelY + TILE_SIZE - 2 };
+        Vector2 p3 = { pixelX + (i * (TILE_SIZE / (float)nOndas)) + (TILE_SIZE / (2.0f*nOndas)), pixelY + TILE_SIZE - 2 - (TILE_SIZE / 4.0f) };
+        DrawTriangle(p1, p2, p3, cegoCor);
+    }
+
+    // olho
+    int raio_olho = TILE_SIZE / 10; 
+    int offset_y = TILE_SIZE / 4;
+    int offset_x = TILE_SIZE / 6;
+    DrawCircle(centroX - offset_x, centroY - offset_y, raio_olho, WHITE);
+    DrawCircle(centroX + offset_x, centroY - offset_y, raio_olho, WHITE);
+
+    // boca ondulada 
+    Color bocaCor = YELLOW;
+    int boca_y = centroY + TILE_SIZE/8; 
+    int nOnda = 5;
+    float boca_largura = TILE_SIZE / 1.5f;
+
+    for (int i = 0; i < nOnda; i++) {
+        float x1 = centroX - boca_largura/2 + i * (boca_largura / nOnda);
+        float x2 = centroX - boca_largura/2 + (i + 1) * (boca_largura / nOnda);
+        float y1 = boca_y + ((i % 2 == 0) ? 2 : -2);
+        float y2 = boca_y;
+
+        DrawLine((int)x1, (int)y2, (int)((x1+x2)/2), (int)y1, bocaCor);
+        DrawLine((int)((x1+x2)/2), (int)y1, (int)x2, (int)y2, bocaCor);
+    }
 }

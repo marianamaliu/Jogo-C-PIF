@@ -86,6 +86,8 @@ void colisao(Jogo *jogo){
         jogo->pontuacao_atual+=50;
         jogo->pontoComida+=10;
 
+        jogo->tempo_cego=30;
+
         if(!jogo->inicializarFruta && jogo->pontoComida>=jogo->maxComida){
             gerar_fruta(jogo); //se pegar 5 bolinhas (50 pontos)
             jogo->pontoComida=0;

@@ -25,13 +25,13 @@ void MostrarTelaInicial(Texture2D fundo){
             int fontTitulo = 60;
             int larguraTitulo = MeasureText(titulo, fontTitulo);
 
-            DrawText(titulo, GetScreenWidth()/2 - larguraTitulo/2, GetScreenHeight()/3, fontTitulo, YELLOW);
+            DrawText(titulo, GetScreenWidth()/2 - larguraTitulo/2, GetScreenHeight()/12, fontTitulo, YELLOW);
             
             const char *subtitulo = "Pressione ENTER para jogar";
             int fontSub = 20;
             int larguraSub = MeasureText(subtitulo, fontSub);
 
-            DrawText(subtitulo, GetScreenWidth()/2 - larguraSub/2, GetScreenHeight()/2, fontSub, RAYWHITE);
+            DrawText(subtitulo, GetScreenWidth()/2 - larguraSub/2, GetScreenHeight()/12 + fontTitulo, fontSub, RAYWHITE);
         EndDrawing();
     }
 }

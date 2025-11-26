@@ -94,7 +94,11 @@ int main(){
                 }
 
                 for(int i=0; i<jogo.qntd_fantasmas; i++){
-                    desenhar_fantasma(jogo.fantasmas[i], jogo.fantasmas[i].cor);
+                    if(jogo.tempo_cego > 0){
+                        desenhar_fantasma_cego(jogo.fantasmas[i]);
+                    } else {
+                        desenhar_fantasma(jogo.fantasmas[i], jogo.fantasmas[i].cor);
+                    }
                 }
 
                 if(jogo.tempo_iniciar>0){
