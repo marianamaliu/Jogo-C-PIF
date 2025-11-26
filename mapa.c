@@ -1,17 +1,8 @@
 #include "mapa.h"
 
 void desenhar_mapa(Jogo *jogo){
-    Nivel nivel_atual = jogo->niveis[jogo->nivel_atual];
-    Color cor = jogo->niveis[jogo->nivel_atual].cor_mapa;
-
-    //caixa dos fantasmas
-    int caixa_x_pixel = nivel_atual.caixa_x * TILE_SIZE;
-    int caixa_y_pixel = nivel_atual.caixa_y * TILE_SIZE;
-    int caixa_largura_pixel = nivel_atual.caixa_largura * TILE_SIZE;
-    int caixa_altura_pixel = nivel_atual.caixa_altura * TILE_SIZE;
-
-   
-
+    Color cor = DARKBLUE;
+    
     //desenho do mapa
     for(int i=0; i<ALTURA; i++){ //y
         for(int j=0; j<LARGURA; j++){ //x
@@ -35,13 +26,6 @@ void desenhar_mapa(Jogo *jogo){
                     float prox_centroY = (i + 1) * TILE_SIZE + TILE_SIZE / 2;
                     DrawLineEx((Vector2){centroX, centroY},(Vector2){centroX, prox_centroY},GROSSURA_LINHA, cor);
                 }
-
-                //Opcao 2
-                //DrawRectangleLinesEx((Rectangle){j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE, TILE_SIZE}, GROSSURA_LINHA, DARKBLUE);
-                
-                //Opcao 1
-                //DrawRectangle( j * TILE_SIZE,  i * TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKBLUE);
-                //pega a posição da linha i/y e multiplica pelo tam do bloco p obter a coordenada i(x) na tela
             
             }else if(tile == '.'){
                 DrawCircle( j * TILE_SIZE + TILE_SIZE/2,   i * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/8, YELLOW);

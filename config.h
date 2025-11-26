@@ -39,16 +39,10 @@ typedef struct{
     int y;
 }Comida;
 
-typedef enum{
-    CEREJA,
-    MORANGO,
-    LARANJA
-}TipoFruta;
-
 typedef struct{
     int x;
     int y;
-    TipoFruta tipo;
+    int temporizador; //para a fruta sumir em x segundos
 }Fruta;
 
 typedef struct{
@@ -61,17 +55,6 @@ typedef struct Score{
     int pontos;
     struct Score *next;
 }Score;
-
-typedef struct{
-    char **matriz;
-    Color cor_mapa;
-    float velocidade; //p aumentar a velocidade dos fantasmas
-    int caixa_x; //onde os fantasmas reaparecem no mapa
-    int caixa_y;
-    int caixa_largura;
-    int caixa_altura;
-    TipoFruta fruta_nivel;
-}Nivel;
 
 typedef struct{
     Mapa mapa;
@@ -87,11 +70,11 @@ typedef struct{
     int pontoComida;
     int maxComida; //qntd de comida p aparecer a fruta
     bool inicializarFruta;
-    
-    Nivel niveis[3];
-    int nivel_atual;
     int vidas;
     int tempo_cego; //contador p o fantasma cego
+    int tempo_iniciar;
+    int total_bolinhas;
+    int bolinhas_comidas;
 }Jogo;
 
 #endif

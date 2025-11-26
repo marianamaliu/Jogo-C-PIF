@@ -164,9 +164,8 @@ static void alvo_clyde(Jogo *j, Fantasma *f, int *ax, int *ay) {
 static void definir_alvo(Fantasma *f, Jogo *j) {
     /* Se na caixa / voltando -> alvo = caixa */
     if (f->modo == FANTASMA_NA_CAIXA || f->modo == FANTASMA_VOLTANDO_CAIXA) {
-        Nivel *n = &j->niveis[j->nivel_atual];
-        f->alvo_x = n->caixa_x;
-        f->alvo_y = n->caixa_y;
+        f->alvo_x = 18;
+        f->alvo_y = 7;
         return;
     }
 
@@ -213,7 +212,7 @@ void atualizar_fantasma(Jogo *jogo) {
     float dt = GetFrameTime();
     tempo_acumulado_fantasma += dt;
 
-    float multiplicador = jogo->niveis[jogo->nivel_atual].velocidade;
+    float multiplicador = 0.0f;
     float tempo_movimento = TEMPO_BASE_MOVIMENTO / multiplicador;
 
     while (tempo_acumulado_fantasma >= tempo_movimento) {

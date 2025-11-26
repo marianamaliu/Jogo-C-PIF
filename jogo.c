@@ -41,7 +41,6 @@ static const char *MAPA[ALTURA] = { //layout do labirinto; cada elemento do arra
 
 
 void inicalizar(Jogo *jogo);
-void inicializar_nivel(Jogo *jogo);
 void desenhar_placar(Jogo *jogo);
 void Score_max(Jogo *jogo, int pontuacao_atual);
 void liberar(Jogo *jogo);
@@ -61,9 +60,24 @@ int main(){
     while(!WindowShouldClose()){
         //if criado para verificar se vai ser GameOver
         if(jogo.jogo_ativo){
-            atualizar_pacman(&jogo);
-            atualizar_fantasma(&jogo); 
-            colisao(&jogo);
+            if(jogo.bolinhas_comidas == jogo.total_bolinhas){
+                jogo.jogo_ativo=false;
+            }
+            
+            if(jogo.tempo_iniciar>0){
+                jogo.tempo_iniciar--;
+            }else{
+                atualizar_pacman(&jogo);
+                atualizar_fantasma(&jogo); 
+                colisao(&jogo);
+
+                if(jogo.inicializarFruta){
+                    jogo.fruta.temporizador--;
+                    if(jogo.fruta.temporizador<=0){
+                        jogo.inicializarFruta=false;
+                    }
+                }
+            }
         }
 
         BeginDrawing();
@@ -82,63 +96,63 @@ int main(){
                 for(int i=0; i<jogo.qntd_fantasmas; i++){
                     desenhar_fantasma(jogo.fantasmas[i], jogo.fantasmas[i].cor);
                 }
+
+                if(jogo.tempo_iniciar>0){
+                    const char *ready_text = "READY!";
+                    int font_size = 50;
+                    int text_width = MeasureText(ready_text, font_size);
+                    int x_pos = (JANELA_LARGURA / 2) - (text_width / 2);
+                    int y_pos = (JANELA_ALTURA / 2) + TILE_SIZE; // Abaixo da casa dos fantasmas
+                    
+                    DrawText(ready_text, x_pos, y_pos, font_size, YELLOW);
+                }
             }else{
-
                 Score_max(&jogo, jogo.pontuacao_atual);
-
-                DrawText("GAME OVER!", JANELA_LARGURA/2 - MeasureText("GAME OVER!", 40)/2, JANELA_ALTURA/4, 40, RED);
-
                 char score_text[50];
                 char high_score_text[50];
-                
-                sprintf(score_text, "SEU SCORE: %d", jogo.pontuacao_atual);
-                sprintf(high_score_text, "HIGH SCORE: %d", jogo.pontuacao_max);
 
-                DrawText(score_text, JANELA_LARGURA/2 - MeasureText(score_text, 25)/2, JANELA_ALTURA/2, 25, YELLOW);
-                DrawText(high_score_text, JANELA_LARGURA/2 - MeasureText(high_score_text, 25)/2, JANELA_ALTURA/2 + 40, 25, WHITE);
+                if(jogo.bolinhas_comidas==jogo.total_bolinhas){
+                    DrawText("VOCÊ VENCEU O JOGO!", JANELA_LARGURA/2 - MeasureText("VOCÊ VENCEU O JOGO!", 40)/2, JANELA_ALTURA/4, 40, GOLD);
+                    sprintf(score_text, "SEU SCORE: %d", jogo.pontuacao_atual);
+                    sprintf(high_score_text, "HIGH SCORE: %d", jogo.pontuacao_max);
 
-                DrawText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 
-                         JANELA_LARGURA/2 - MeasureText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 20)/2, 
-                         JANELA_ALTURA/2 + 100, 20, GREEN);
-                
-                if(IsKeyPressed(KEY_ENTER)){
-                    MostrarTelaInicial(fundoMenu);
-                    liberar(&jogo);
-                    inicalizar(&jogo);
+                    DrawText(score_text, JANELA_LARGURA/2 - MeasureText(score_text, 25)/2, JANELA_ALTURA/2, 25, YELLOW);
+                    DrawText(high_score_text, JANELA_LARGURA/2 - MeasureText(high_score_text, 25)/2, JANELA_ALTURA/2 + 40, 25, WHITE);
+
+                    DrawText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 
+                            JANELA_LARGURA/2 - MeasureText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 20)/2, 
+                            JANELA_ALTURA/2 + 100, 20, GREEN);
+                    
+                    if(IsKeyPressed(KEY_ENTER)){
+                        MostrarTelaInicial(fundoMenu);
+                        liberar(&jogo);
+                        inicalizar(&jogo);
+                    }
+                }else{
+                    DrawText("GAME OVER!", JANELA_LARGURA/2 - MeasureText("GAME OVER!", 40)/2, JANELA_ALTURA/4, 40, RED);
+                    
+                    sprintf(score_text, "SEU SCORE: %d", jogo.pontuacao_atual);
+                    sprintf(high_score_text, "HIGH SCORE: %d", jogo.pontuacao_max);
+
+                    DrawText(score_text, JANELA_LARGURA/2 - MeasureText(score_text, 25)/2, JANELA_ALTURA/2, 25, YELLOW);
+                    DrawText(high_score_text, JANELA_LARGURA/2 - MeasureText(high_score_text, 25)/2, JANELA_ALTURA/2 + 40, 25, WHITE);
+
+                    DrawText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 
+                            JANELA_LARGURA/2 - MeasureText("PRESSIONE ENTER PARA JOGAR NOVAMENTE", 20)/2, 
+                            JANELA_ALTURA/2 + 100, 20, GREEN);
+                    
+                    if(IsKeyPressed(KEY_ENTER)){
+                        MostrarTelaInicial(fundoMenu);
+                        liberar(&jogo);
+                        inicalizar(&jogo);
+                    }
                 }
             }
-            
         EndDrawing();
     }
     liberar(&jogo);
     CloseWindow();
     return 0;
-}
-
-void inicializar_nivel(Jogo *jogo){
-    jogo->niveis[0].cor_mapa=DARKBLUE;
-    jogo->niveis[0].velocidade=0.8f;
-    jogo->niveis[0].fruta_nivel=CEREJA;
-    jogo->niveis[0].caixa_x=18;
-    jogo->niveis[0].caixa_y=7;
-    jogo->niveis[0].caixa_largura=6;
-    jogo->niveis[0].caixa_altura=3;
-
-    jogo->niveis[1].cor_mapa=MAGENTA;
-    jogo->niveis[1].velocidade=1.2f;
-    jogo->niveis[1].fruta_nivel=MORANGO;
-    jogo->niveis[1].caixa_x=18;
-    jogo->niveis[1].caixa_y=7;
-    jogo->niveis[1].caixa_largura=5;
-    jogo->niveis[1].caixa_altura=3;
-
-    jogo->niveis[2].cor_mapa=GREEN;
-    jogo->niveis[2].velocidade=1.5f;
-    jogo->niveis[2].fruta_nivel=MORANGO;
-    jogo->niveis[2].caixa_x=18;
-    jogo->niveis[2].caixa_y=7;
-    jogo->niveis[2].caixa_largura=5;
-    jogo->niveis[2].caixa_altura=4;
 }
 
 void inicalizar(Jogo *jogo){
@@ -158,16 +172,29 @@ void inicalizar(Jogo *jogo){
     jogo->pontoComida=0;
     jogo->maxComida=50;
     jogo->inicializarFruta=false;
-    jogo->nivel_atual=0;
+    jogo->tempo_iniciar=30; //3 segundos * 10 FPS
+    
+    //ver quantas bolinhas ele comeu e quantas tem no total do mapa para o jogo acabar
+    jogo->bolinhas_comidas=0; 
+    jogo->total_bolinhas=0; 
+    for(int i=0; i<ALTURA; i++){
+        for(int j=0; j<LARGURA; j++){
+            if(MAPA[i][j]== '.'){
+                jogo->total_bolinhas++;
+            }
+        }
+    }
+    jogo->total_bolinhas++; //nao entendi
 
-    inicializar_nivel(jogo);
+    int spawn_caixa_x = 18; // Posição da caixa dos fantasmas (Mantido)
+    int spawn_caixa_y = 7;
 
     // seed do rand (uma vez)
     srand((unsigned)time(NULL));
 
     //Pacman
-    jogo->pacman.x=2;
-    jogo->pacman.y=1;
+    jogo->pacman.x=20;
+    jogo->pacman.y=10;
     jogo->pacman.dx=1;
     jogo->pacman.dy=0;
 
@@ -178,9 +205,8 @@ void inicalizar(Jogo *jogo){
     Color cor_fantasma[]={RED, PINK, ORANGE, SKYBLUE};
     int total_cores=sizeof(cor_fantasma)/sizeof(cor_fantasma[0]);
 
-    Nivel nivel_inicial = jogo->niveis[0];
-    int spawn_x = nivel_inicial.caixa_x + 1; 
-    int spawn_y = nivel_inicial.caixa_y + 1;
+    int spawn_x = spawn_caixa_x + 1; 
+    int spawn_y = spawn_caixa_y + 1;
 
     for(int i=0; i<jogo->qntd_fantasmas; i++){
         Fantasma *f = &jogo->fantasmas[i];
