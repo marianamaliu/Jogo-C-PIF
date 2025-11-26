@@ -212,7 +212,7 @@ void atualizar_fantasma(Jogo *jogo) {
     float dt = GetFrameTime();
     tempo_acumulado_fantasma += dt;
 
-    float multiplicador = 0.0f;
+    float multiplicador = 0.8f;
     float tempo_movimento = TEMPO_BASE_MOVIMENTO / multiplicador;
 
     while (tempo_acumulado_fantasma >= tempo_movimento) {
