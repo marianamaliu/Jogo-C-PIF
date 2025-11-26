@@ -1,4 +1,5 @@
 #include "pacman.h"
+#include "config.h"
 
 void desenhar_pacman(Pacman pacman){
     //converte as coordenadas da matriz em coodenadas de pixel
@@ -77,13 +78,19 @@ void colisao(Jogo *jogo){
     //detectar bolinhas menores
     if(jogo->mapa.mapa[pacman->y][pacman->x]=='.'){
         jogo->mapa.mapa[pacman->y][pacman->x]=' '; //remove a bolinha
-        jogo->pontuacao_atual+=5;
+        jogo->pontuacao_atual+=10;
     }
     
     //detectar comida
     if(pacman->x==comida->x && pacman->y==comida->y){
-        jogo->pontuacao_atual+=10;
+        jogo->pontuacao_atual+=50;
         jogo->pontoComida+=10;
+
+        jogo->tempo_cego=50;
+        for(int i=0; i<jogo->qntd_fantasmas; i++){
+            Fantasma *f = &jogo->fantasmas[i];
+            
+        }
 
         if(!jogo->inicializarFruta && jogo->pontoComida>=jogo->maxComida){
             gerar_fruta(jogo); //se pegar 5 bolinhas (50 pontos)
@@ -94,7 +101,7 @@ void colisao(Jogo *jogo){
 
     //detectar fruta
     if(jogo->inicializarFruta && pacman->x==fruta->x && pacman->y==fruta->y){
-        jogo->pontuacao_atual+=50;
+        jogo->pontuacao_atual+=100;
         jogo->inicializarFruta=false;
     }
 

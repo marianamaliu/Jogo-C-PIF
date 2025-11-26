@@ -61,9 +61,8 @@ typedef struct{
     int pontoComida;
     int maxComida; //qntd de comida p aparecer a fruta
     bool inicializarFruta;
-    int vidas;
     int tempo_cego; //contador p o fantasma cego
-    int tempo_iniciar;
+    int tempo_iniciar; //tempo antes do jogo de fato começar
 }Jogo;
 
 #endif
