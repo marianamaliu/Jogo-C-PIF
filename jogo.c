@@ -178,10 +178,10 @@ void inicalizar(Jogo *jogo){
     jogo->inicializarFruta=false;
     jogo->tempo_iniciar=30; //3 segundos * 10 FPS
 
-    int spawn_caixa_x = 18; // Posição da caixa dos fantasmas (Mantido)
+    int spawn_caixa_x = 18;
     int spawn_caixa_y = 7;
 
-    // seed do rand (uma vez)
+   
     srand((unsigned)time(NULL));
 
     //Pacman
@@ -203,7 +203,7 @@ void inicalizar(Jogo *jogo){
     for(int i=0; i<jogo->qntd_fantasmas; i++){
         Fantasma *f = &jogo->fantasmas[i];
 
-        f->id = i;                                   // importante!
+        f->id = i;                                   
         f->x = spawn_x + i;
         f->y = spawn_y;
 
@@ -214,7 +214,7 @@ void inicalizar(Jogo *jogo){
         f->cor = cor_fantasma[i % total_cores];
 
         // campos necessários inicializados:
-        f->tempo_para_sair = 0;       // 0 = já pode se mover; se quiser delay, coloque >0
+        f->tempo_para_sair = 0;       
         f->alvo_x = f->x;
         f->alvo_y = f->y;
     }

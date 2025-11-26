@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-/* tempo de acumulo para mover fantasmas (usa GetFrameTime() do raylib no .c principal) */
+
 static float tempo_acumulado_fantasma = 0.0f;
 #define TEMPO_BASE_MOVIMENTO 0.1f
 
@@ -17,7 +17,7 @@ static inline bool dentro_mapa(int x, int y) {
 }
 
 /* eh_parede considera apenas '#' como parede.
-   'G' (porta/ghost house) é tratado como livre conforme sua escolha (3). */
+   'G' é tratado como livre */
 static inline bool eh_parede(Jogo *j, int x, int y) {
     if (!dentro_mapa(x, y)) return true;
     return j->mapa.mapa[y][x] == '#';
@@ -50,9 +50,7 @@ static void inicializar_direcao_valida(Fantasma *f, Jogo *j) {
     f->dx = 0; f->dy = 0;
 }
 
-/* --- BFS para retornar o PRÓXIMO tile do start até target
-   Preenche next_x/next_y com o primeiro passo após (sx,sy).
-   Retorna true se achou caminho. */
+
 static bool bfs_proximo_passo(Jogo *j, int sx, int sy, int tx, int ty, int *next_x, int *next_y) {
     if (!dentro_mapa(sx, sy) || !dentro_mapa(tx, ty)) return false;
     if (eh_parede(j, tx, ty)) return false;
@@ -81,7 +79,7 @@ static bool bfs_proximo_passo(Jogo *j, int sx, int sy, int tx, int ty, int *next
             int ny = cur.y + DIR_Y[i];
             if (!dentro_mapa(nx, ny)) continue;
             if (eh_parede(j, nx, ny)) continue;
-            if (px[ny][nx] != -1) continue; /* já visitado */
+            if (px[ny][nx] != -1) continue; 
 
             px[ny][nx] = cur.x;
             py[ny][nx] = cur.y;
@@ -91,12 +89,11 @@ static bool bfs_proximo_passo(Jogo *j, int sx, int sy, int tx, int ty, int *next
 
     if (!found) return false;
 
-    /* retroceder do target até achar o filho direto do start */
     int cx = tx, cy = ty;
     while (!(px[cy][cx] == sx && py[cy][cx] == sy)) {
         int tx2 = px[cy][cx];
         int ty2 = py[cy][cx];
-        if (tx2 == -1 && ty2 == -1) break; /* proteção */
+        if (tx2 == -1 && ty2 == -1) break; 
         cx = tx2; cy = ty2;
     }
 
@@ -105,7 +102,7 @@ static bool bfs_proximo_passo(Jogo *j, int sx, int sy, int tx, int ty, int *next
     return true;
 }
 
-/* --- alvos estilo clássico --- */
+
 static void alvo_blinky(Jogo *j, Fantasma *f, int *ax, int *ay) {
     *ax = j->pacman.x;
     *ay = j->pacman.y;
@@ -174,7 +171,6 @@ static void definir_alvo(Fantasma *f, Jogo *j) {
     }
 }
 
-/* --- atualização principal (usa seu sistema de tempo) --- */
 void atualizar_fantasma(Jogo *jogo) {
     garantir_seed();
 
