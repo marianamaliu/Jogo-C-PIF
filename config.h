@@ -12,10 +12,7 @@
 
 typedef enum{
     FANTASMA_SEGUIR,
-    FANTASMA_ESPALHAR,
-    FANTASMA_CEGO,
     FANTASMA_NA_CAIXA,
-    FANTASMA_VOLTANDO_CAIXA,
 }ModoFantasma;
 
 typedef struct{

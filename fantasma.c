@@ -162,38 +162,7 @@ static void alvo_clyde(Jogo *j, Fantasma *f, int *ax, int *ay) {
 
 /* --- definir alvo considerando modo --- */
 static void definir_alvo(Fantasma *f, Jogo *j) {
-    /* Se na caixa / voltando -> alvo = caixa */
-    if (f->modo == FANTASMA_NA_CAIXA || f->modo == FANTASMA_VOLTANDO_CAIXA) {
-        f->alvo_x = 18;
-        f->alvo_y = 7;
-        return;
-    }
 
-    /* Se cego -> alvo aleatório válido */
-    if (f->modo == FANTASMA_CEGO) {
-        garantir_seed();
-        int tries = 0;
-        int rx, ry;
-        do {
-            rx = rand() % LARGURA;
-            ry = rand() % ALTURA;
-            tries++;
-        } while (eh_parede(j, rx, ry) && tries < 200);
-        f->alvo_x = rx;
-        f->alvo_y = ry;
-        return;
-    }
-
-    /* Se espalhar -> corners por id */
-    if (f->modo == FANTASMA_ESPALHAR) {
-        switch (f->id % 4) {
-            case 0: f->alvo_x = LARGURA - 2; f->alvo_y = 1; break;
-            case 1: f->alvo_x = 1; f->alvo_y = 1; break;
-            case 2: f->alvo_x = LARGURA - 2; f->alvo_y = ALTURA - 2; break;
-            case 3: f->alvo_x = 1; f->alvo_y = ALTURA - 2; break;
-        }
-        return;
-    }
 
     /* Modo perseguir: escolha por id */
     switch (f->id % 4) {
