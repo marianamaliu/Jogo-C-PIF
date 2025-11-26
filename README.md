@@ -55,7 +55,9 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
   ```
 
 ## Jogo em Execução 👻
-https://github.com/user-attachments/assets/f3251054-5c57-4fdf-b981-470a7215b869
+https://github.com/user-attachments/assets/21010b4b-060f-4b09-b8aa-28a73af6bf89
+
+
 
 
 
@@ -82,6 +84,7 @@ https://github.com/user-attachments/assets/f3251054-5c57-4fdf-b981-470a7215b869
 
   </tbody>
 </table>
+
 
 
 
