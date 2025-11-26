@@ -10,10 +10,6 @@
 #define JANELA_ALTURA (ALTURA*TILE_SIZE) //calcula a altura total da janela em pixels
 #define GROSSURA_LINHA 2
 
-typedef enum{
-    FANTASMA_SEGUIR,
-    FANTASMA_NA_CAIXA,
-}ModoFantasma;
 
 typedef struct{
     int x, y; //posicao do pacman
@@ -23,7 +19,6 @@ typedef struct{
 typedef struct{
     int x, y; //posicao do fantasma
     int dx, dy; //direcao
-    ModoFantasma modo;
     Color cor;
     int id; //cada fantasma
     int tempo_para_sair; //tempo p sair da caixa

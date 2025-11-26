@@ -210,7 +210,6 @@ void inicalizar(Jogo *jogo){
         f->cor = cor_fantasma[i % total_cores];
 
         // campos necessários inicializados:
-        f->modo = FANTASMA_SEGUIR;    // pode ajustar para FANTASMA_NA_CAIXA se quiser que fiquem presos no começo
         f->tempo_para_sair = 0;       // 0 = já pode se mover; se quiser delay, coloque >0
         f->alvo_x = f->x;
         f->alvo_y = f->y;

@@ -86,12 +86,6 @@ void colisao(Jogo *jogo){
         jogo->pontuacao_atual+=50;
         jogo->pontoComida+=10;
 
-        jogo->tempo_cego=50;
-        for(int i=0; i<jogo->qntd_fantasmas; i++){
-            Fantasma *f = &jogo->fantasmas[i];
-            
-        }
-
         if(!jogo->inicializarFruta && jogo->pontoComida>=jogo->maxComida){
             gerar_fruta(jogo); //se pegar 5 bolinhas (50 pontos)
             jogo->pontoComida=0;
