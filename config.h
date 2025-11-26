@@ -51,18 +51,12 @@ typedef struct{
     char **mapa; //mapa[altura][largura]
 }Mapa;
 
-typedef struct Score{
-    int pontos;
-    struct Score *next;
-}Score;
-
 typedef struct{
     Mapa mapa;
     Pacman pacman;
     Fantasma *fantasmas; //vetor dinamico p/ ser mais flexivel
     Comida comida;
     Fruta fruta;
-    Score score;
     int qntd_fantasmas;
     bool jogo_ativo;
     int pontuacao_atual;
@@ -73,8 +67,6 @@ typedef struct{
     int vidas;
     int tempo_cego; //contador p o fantasma cego
     int tempo_iniciar;
-    int total_bolinhas;
-    int bolinhas_comidas;
 }Jogo;
 
 #endif

@@ -75,17 +75,15 @@ void colisao(Jogo *jogo){
     }
 
     //detectar bolinhas menores
-    if(jogo->mapa.mapa[proximoY][proximoX]=='.'){
-        jogo->mapa.mapa[proximoY][proximoX]=' '; //remove a bolinha
+    if(jogo->mapa.mapa[pacman->y][pacman->x]=='.'){
+        jogo->mapa.mapa[pacman->y][pacman->x]=' '; //remove a bolinha
         jogo->pontuacao_atual+=5;
-        jogo->bolinhas_comidas++;
     }
     
     //detectar comida
-    if(proximoX==comida->x && proximoY==comida->y){
+    if(pacman->x==comida->x && pacman->y==comida->y){
         jogo->pontuacao_atual+=10;
         jogo->pontoComida+=10;
-        jogo->bolinhas_comidas++;
 
         if(!jogo->inicializarFruta && jogo->pontoComida>=jogo->maxComida){
             gerar_fruta(jogo); //se pegar 5 bolinhas (50 pontos)
@@ -95,7 +93,7 @@ void colisao(Jogo *jogo){
     }
 
     //detectar fruta
-    if(jogo->inicializarFruta && proximoX==fruta->x && proximoY==fruta->y){
+    if(jogo->inicializarFruta && pacman->x==fruta->x && pacman->y==fruta->y){
         jogo->pontuacao_atual+=50;
         jogo->inicializarFruta=false;
     }

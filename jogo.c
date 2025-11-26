@@ -60,10 +60,10 @@ int main(){
     while(!WindowShouldClose()){
         //if criado para verificar se vai ser GameOver
         if(jogo.jogo_ativo){
-            if(jogo.bolinhas_comidas == jogo.total_bolinhas){
-                jogo.jogo_ativo=false;
+            if(!existe_bolinha(&jogo)){
+                jogo.jogo_ativo = false;
             }
-            
+
             if(jogo.tempo_iniciar>0){
                 jogo.tempo_iniciar--;
             }else{
@@ -111,7 +111,7 @@ int main(){
                 char score_text[50];
                 char high_score_text[50];
 
-                if(jogo.bolinhas_comidas==jogo.total_bolinhas){
+                if(!existe_bolinha(&jogo)){
                     DrawText("VOCÊ VENCEU O JOGO!", JANELA_LARGURA/2 - MeasureText("VOCÊ VENCEU O JOGO!", 40)/2, JANELA_ALTURA/4, 40, GOLD);
                     sprintf(score_text, "SEU SCORE: %d", jogo.pontuacao_atual);
                     sprintf(high_score_text, "HIGH SCORE: %d", jogo.pontuacao_max);
@@ -173,18 +173,6 @@ void inicalizar(Jogo *jogo){
     jogo->maxComida=50;
     jogo->inicializarFruta=false;
     jogo->tempo_iniciar=30; //3 segundos * 10 FPS
-    
-    //ver quantas bolinhas ele comeu e quantas tem no total do mapa para o jogo acabar
-    jogo->bolinhas_comidas=0; 
-    jogo->total_bolinhas=0; 
-    for(int i=0; i<ALTURA; i++){
-        for(int j=0; j<LARGURA; j++){
-            if(MAPA[i][j]== '.'){
-                jogo->total_bolinhas++;
-            }
-        }
-    }
-    jogo->total_bolinhas++; //nao entendi
 
     int spawn_caixa_x = 18; // Posição da caixa dos fantasmas (Mantido)
     int spawn_caixa_y = 7;

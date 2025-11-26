@@ -37,40 +37,52 @@ void desenhar_fruta(Jogo *jogo){
     desenhar_cereja(centroX, centroY, raio_base);
 }
 
+bool existe_bolinha(Jogo *jogo){
+    for(int y=0; y<ALTURA; y++){
+        for(int x=0; x<LARGURA; x++){
+            if(jogo->mapa.mapa[y][x] == '.'){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 //gerar
 void gerar_comida(Jogo *jogo){
-    Comida *comida=&jogo->comida;
-    //aleatoriedade
-    int novoX = rand() % (LARGURA-2) + 1; 
-    int novoY = rand() % (ALTURA-2) + 1;
+    Comida *comida = &jogo->comida;
 
-    //se for na parede ou se nao for onde tem '.', ele sorteia os valores de novo ate nao ser na parede
-    if(jogo->mapa.mapa[novoY][novoX]=='#' || jogo->mapa.mapa[novoY][novoX]!='.'){ 
-        gerar_comida(jogo);
-        
-    }else{
-        comida->x=novoX;
-        comida->y=novoY;
+    if(!existe_bolinha(jogo)){
+        return; //nao gerar comida quando não tem mais '.'
     }
+
+    int novoX, novoY;
+    do {
+        novoX = rand() % (LARGURA-2) + 1;
+        novoY = rand() % (ALTURA-2) + 1;
+    } while(jogo->mapa.mapa[novoY][novoX] != '.');
+
+    comida->x = novoX;
+    comida->y = novoY;
 }
 
 void gerar_fruta(Jogo *jogo){
-    Fruta *fruta=&jogo->fruta;
-    Comida *comida=&jogo->comida;
-
-    //aleatoriedade
-    int novoX=rand()%(LARGURA-2)+1;
-    int novoY=rand()%(ALTURA-1)+1;
-
-    bool colisao_comida = (novoX == comida->x && novoY == comida->y);
-
-    //se for parede ou se for onde ja tem comida ou se nao for no '.', ele gera de novo ate nao ser parede ou nao ter comida
-    if(jogo->mapa.mapa[novoY][novoX]=='#' || colisao_comida || jogo->mapa.mapa[novoY][novoX]!='.'){
-        gerar_fruta(jogo);
-    }else{
-        jogo->inicializarFruta=true;
-        fruta->x=novoX;
-        fruta->y=novoY;
-        fruta->temporizador=100; //10 segundos em frame
+    if(!existe_bolinha(jogo)){
+        return; 
     }
+
+    Fruta *fruta = &jogo->fruta;
+    Comida *comida = &jogo->comida;
+
+    int novoX, novoY;
+    
+    do{
+        novoX = rand() % (LARGURA-2) + 1;
+        novoY = rand() % (ALTURA-2) + 1;
+    } while(jogo->mapa.mapa[novoY][novoX] != '.' ||(novoX == comida->x && novoY == comida->y));
+
+    jogo->inicializarFruta = true;
+    fruta->x = novoX;
+    fruta->y = novoY;
+    fruta->temporizador=100;
 }
