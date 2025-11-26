@@ -30,8 +30,6 @@ Precisamos recriar/criar um jogo casual. Nosso grupo, pensou em um game estilo d
 
   *__TUTORIAL PARA MAC__* : 
   
-  [![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://youtu.be/Gl9CCqlGOZM?si=fnIdJcxA8zisIat-)
-
 - Instalar o Homebrew (caso não tenha)
   ```bash
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -84,5 +82,6 @@ https://github.com/user-attachments/assets/e7723d0e-b824-4748-89fb-d05876ce1d31
 
   </tbody>
 </table>
+
 
 
