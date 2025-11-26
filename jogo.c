@@ -61,11 +61,11 @@ int main(){
         //if criado para verificar se vai ser GameOver
         if(jogo.jogo_ativo){
             if(!existe_bolinha(&jogo)){
-                jogo.jogo_ativo = false;
+                jogo.jogo_ativo = false; //se n existe, o jogo acaba 
             }
 
             if(jogo.tempo_iniciar>0){
-                jogo.tempo_iniciar--;
+                jogo.tempo_iniciar--; //contador dos 3 segundos iniciais ir diminuindo 
             }else{
                 atualizar_pacman(&jogo);
                 atualizar_fantasma(&jogo); 
